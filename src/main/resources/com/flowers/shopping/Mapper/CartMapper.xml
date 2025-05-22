@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flowers.shopping.mapper.CartMapper">
+    <delete id="delete">
+        DELETE FROM cart
+        <where>
+            <foreach collection="list" item="cart" separator=" OR ">
+                (id = #{cart.id} AND user_id = #{cart.userId})
+            </foreach>
+        </where>
+    </delete>
+
+    <insert id="submitOrder" parameterType="java.util.List" useGeneratedKeys="true">
+        <selectKey keyProperty="orderId" resultType="long" order="BEFORE">
+            <!-- 插入订单信息到orders表 -->
+            INSERT INTO orders (user_id, address_id, total_amount, status, payment_method)
+            VALUES (
+            #{cart[0].userId},
+            #{cart[0].addressId},
+            #{cart[0].totalAmount},
+            '待支付',
+            #{cart[0].paymentMethod}
+            );
+            <!-- 获取自增ID -->
+            SELECT LAST_INSERT_ID();
+        </selectKey>
+
+        INSERT INTO order_items (order_id, product_id, product_name, price, quantity, subtotal)
+        VALUES
+        <foreach collection="cart" item="item" separator=",">
+            (#{orderId}, #{item.productId}, #{item.productName}, #{item.price}, #{item.quantity}, #{item.subtotal})
+        </foreach>
+    </insert>
+</mapper>

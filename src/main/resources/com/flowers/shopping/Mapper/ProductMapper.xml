@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flowers.shopping.mapper.ProductMapper">
+    <update id="update">
+        update products
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="description != null and description != ''">
+                description = #{description},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="stock != null">
+                stock = #{stock},
+            </if>
+            <if test="category != null and category != ''">
+                category = #{category},
+            </if>
+            <if test="imageUrl != null and imageUrl != ''">
+                image_url = #{imageUrl},
+            </if>
+            <if test="updatedAt != null">
+                updated_at = #{updatedAt},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="selectByPage" resultType="com.flowers.shopping.entity.Product">
+        select * from products
+        <where>
+            <if test="name != null">
+                and name like '%${name}%'
+            </if>
+            <if test="category != null">
+                and category like '%${category}%'
+            </if>
+            <if test="beginPrice != null and endPrice != null">
+                and price between #{beginPrice} and #{endPrice}
+            </if>
+            <if test="begin != null and end != null">
+                and created_at between #{begin} and #{end}
+            </if>
+        </where>
+    </select>
+</mapper>

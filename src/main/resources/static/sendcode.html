@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>邮箱验证码</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            max-width: 400px;
+            margin: auto;
+        }
+        input[type="email"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<h2>发送邮箱验证码</h2>
+
+<label for="email">邮箱地址：</label>
+<input type="email" id="email" placeholder="请输入您的邮箱" required />
+
+<button id="sendCodeBtn">发送验证码</button>
+
+<label for="code">验证码：</label>
+<input type="text" id="code" placeholder="请输入收到的验证码" />
+
+<button onclick="verifyCode()">验证验证码</button>
+
+<script>
+    const sendCodeBtn = document.getElementById('sendCodeBtn');
+    const emailInput = document.getElementById('email');
+
+    let countdown = 60;
+    let timer = null;
+
+    sendCodeBtn.addEventListener('click', () => {
+        const email = emailInput.value.trim();
+        if (!validateEmail(email)) {
+            alert('请输入有效的邮箱地址');
+            return;
+        }
+
+        // 调用后端发送验证码接口
+        fetch('http://localhost:8080/api/email/send-verification-code?email=' + encodeURIComponent(email), {
+            method: 'POST'
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('验证码已发送，请查收邮件');
+                    startCountdown();
+                } else {
+                    alert('发送验证码失败，请重试');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('网络错误，请检查连接');
+            });
+    });
+
+    function validateEmail(email) {
+        // 简单的邮箱格式验证
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    function startCountdown() {
+        sendCodeBtn.disabled = true;
+        sendCodeBtn.textContent = `重新发送(${countdown})`;
+
+        timer = setInterval(() => {
+            countdown--;
+            sendCodeBtn.textContent = `重新发送(${countdown})`;
+            if (countdown <= 0) {
+                clearInterval(timer);
+                sendCodeBtn.disabled = false;
+                sendCodeBtn.textContent = '发送验证码';
+                countdown = 60;
+            }
+        }, 1000);
+    }
+
+    function verifyCode() {
+        const email = emailInput.value.trim();
+        const code = document.getElementById('code').value.trim();
+
+        if (!email || !code) {
+            alert('请填写邮箱和验证码');
+            return;
+        }
+
+        fetch('http://localhost:8080/api/email/verify-code', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, code })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('验证码正确！');
+                } else {
+                    alert('验证码错误或已过期');
+                }
+            })
+            .catch(error => {
+                console.error('验证失败:', error);
+                alert('验证过程中发生错误');
+            });
+    }
+</script>
+
+</body>
+</html>
