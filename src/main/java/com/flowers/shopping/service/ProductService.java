@@ -19,4 +19,6 @@ public interface ProductService {
     PageResult selectByPage(ProductQueryParam productQueryParam);
 
     List<Product> selectAll();
+
+    List<Product> batchSelectByIds(List<Long> productIds);
 }

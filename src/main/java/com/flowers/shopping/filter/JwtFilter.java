@@ -20,7 +20,16 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String token = request.getHeader("Token");
+        String token = request.getHeader("token");
+        String path = request.getServletPath();
+        // 排除不需要拦截的路径
+        if (path.startsWith("/login") ||
+                path.startsWith("/register") ||
+                path.startsWith("/send-verification-code") ||
+                path.startsWith("/verify-code")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (token != null && !token.isBlank()) {
             try {

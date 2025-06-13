@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(authEntryPointHandler)) // 设置未登录处理器
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/user/add").permitAll()
+                        .requestMatchers("/login", "/register", "/send-verification-code", "/verify-code").permitAll()
                         .anyRequest().authenticated()
                 );
         return http.build();

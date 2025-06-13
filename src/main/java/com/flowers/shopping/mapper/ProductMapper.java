@@ -2,10 +2,7 @@ package com.flowers.shopping.mapper;
 
 import com.flowers.shopping.entity.Product;
 import com.flowers.shopping.entity.ProductQueryParam;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -26,4 +23,7 @@ public interface ProductMapper {
 
     @Select("select * from products")
     List<Product> selectAll();
+
+    List<Product> batchSelectByIds(@Param("ids") List<Long> ids);
+
 }

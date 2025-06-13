@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -106,6 +107,15 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> selectAll() {
         return productMapper.selectAll();
     }
+
+    @Override
+    public List<Product> batchSelectByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return productMapper.batchSelectByIds(ids);
+    }
+
 
     // 辅助方法：缓存产品
     private void cacheProduct(Product product) {

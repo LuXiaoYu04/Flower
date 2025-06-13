@@ -5,6 +5,8 @@ import com.flowers.shopping.entity.PageResult;
 import com.flowers.shopping.entity.User;
 import com.flowers.shopping.entity.UserQueryParam;
 
+import java.util.List;
+
 public interface UserService {
     LoginInfo login(User user);
 
@@ -18,5 +20,8 @@ public interface UserService {
 
     boolean delete(Long id);
 
+    User selectByUsername(String username);
+
+    List<User> batchSelectByIds(List<Long> ids);
 
 }

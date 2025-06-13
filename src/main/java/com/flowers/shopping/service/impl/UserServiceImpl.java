@@ -108,6 +108,18 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
+    @Override
+    public User selectByUsername(String username) {
+        return userMapper.selectByUsername(username);
+    }
+
+    @Override
+    public List<User> batchSelectByIds(List<Long> ids) {
+        return userMapper.batchSelectByIds(ids);
+    }
+
+
+
     @CacheEvict(value = "userPage", allEntries = true)
     public void evictPageCache() {
         // 该方法用于清除所有分页缓存

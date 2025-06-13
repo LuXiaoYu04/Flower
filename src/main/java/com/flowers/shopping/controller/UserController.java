@@ -8,6 +8,11 @@ import com.flowers.shopping.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 /**
  * 用户管理
@@ -46,7 +51,34 @@ public class UserController {
      * 新增用户
      */
     @PostMapping("/add")
-    public Result add(@RequestBody User user){
+    public Result add(@RequestParam String username,
+                      @RequestParam String password,
+                      @RequestParam String email,
+                      @RequestParam String phone,
+                      @RequestParam MultipartFile image){
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setEmail(email);
+        user.setPhone(phone);
+        if (!image.isEmpty()) {
+            try {
+                File uploadDir = new File("D:/upload");
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+                String originalFilename = image.getOriginalFilename();
+                String fileName = UUID.randomUUID().toString() +
+                        (originalFilename != null ?
+                                originalFilename.substring(originalFilename.lastIndexOf(".")) : "");
+                File dest = new File(uploadDir, fileName);
+                image.transferTo(dest);
+                user.setImage("D:/upload/" + fileName);
+            } catch (IOException e) {
+                log.error("图片上传失败", e);
+                return Result.error("图片上传失败");
+            }
+        }
         log.info("新增用户:{}", user);
         return userService.add(user) ? Result.success() : Result.error("添加用户失败");
     }
@@ -55,7 +87,36 @@ public class UserController {
      * 修改用户信息
      */
     @PutMapping
-    public Result update(@RequestBody User user){
+    public Result update(@RequestParam Long id,
+                         @RequestParam String username,
+                         @RequestParam String password,
+                         @RequestParam String email,
+                         @RequestParam String phone,
+                         @RequestParam MultipartFile image ){
+        User user = new User();
+        user.setId(id);
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setEmail(email);
+        user.setPhone(phone);
+        if (!image.isEmpty()) {
+            try {
+                File uploadDir = new File("D:/upload");
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+                String originalFilename = image.getOriginalFilename();
+                String fileName = UUID.randomUUID().toString() +
+                        (originalFilename != null ?
+                                originalFilename.substring(originalFilename.lastIndexOf(".")) : "");
+                File dest = new File(uploadDir, fileName);
+                image.transferTo(dest);
+                user.setImage("D:/upload/" + fileName);
+            } catch (IOException e) {
+                log.error("图片上传失败", e);
+                return Result.error("图片上传失败");
+            }
+        }
         log.info("修改用户:{}", user);
         return userService.update(user) ? Result.success() : Result.error("修改用户失败");
     }
@@ -68,4 +129,6 @@ public class UserController {
         log.info("删除用户:{}", id);
         return userService.delete(id) ? Result.success() : Result.error("删除用户失败");
     }
+
+
 }

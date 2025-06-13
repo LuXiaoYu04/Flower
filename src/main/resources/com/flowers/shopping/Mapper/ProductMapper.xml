@@ -48,4 +48,13 @@
             </if>
         </where>
     </select>
+
+    <select id="batchSelectByIds" resultType="com.flowers.shopping.entity.Product">
+        <![CDATA[
+        SELECT * FROM products WHERE id IN
+        ]]>
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>
